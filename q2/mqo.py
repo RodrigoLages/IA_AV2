@@ -2,6 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def train(X, Y):
+    # Transpõe X e Y para terem N linhas
+    X = X.T
+    Y = Y.T
+
     # Adiciona uma coluna de 1s à esquerda de X
     X = np.c_[np.ones(X.shape[0]), X]
     
@@ -14,6 +18,9 @@ def predict(X, W):
     return X @ W
 
 def evaluate(X, Y, W):
+    # Transpõe X e Y para terem N linhas
+    X = X.T
+    Y = Y.T
     predictions = predict(X, W)
     
     predicted_classes = np.argmax(predictions, axis=1)
