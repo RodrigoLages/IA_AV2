@@ -5,23 +5,36 @@ from models_coefficients import get_mvo_coefficients
 from models_coefficients import get_x_and_y
 from plot_results import plot_results
 import matplotlib.pyplot as plt
-# Obter X_matrix e y_vector
-data = get_x_and_y()
-X_matrix = data['X_matrix']
-y_vector = data['y_vector']
 
-# Agora você pode rodar a simulação de Monte Carlo normalmente
+# Obter X_matrix e y_vector
+dados = get_x_and_y()
+X_matrix = dados['X_matrix']
+y_vector = dados['y_vector']
 
 # Função para calcular o RSS (Soma dos Resíduos Quadrados)
 def calculate_rss(y_true, y_pred):
-    return np.sum((y_true - y_pred) ** 2)
+    sum = 0
+    for j in range(len(y_true)):
+        sum += np.square(y_true[j] - y_pred[j])
+    return sum
+    #return np.sum(np.square(np.subtract(y_true, y_pred)))
+    
+# # Função para depurar o cálculo do RSS
+# def debug_rss_calculation(y_true, y_pred, model_name):
+#     rss = calculate_rss(y_true, y_pred)
+#     print(f"\nModelo: {model_name}")
+#     print("Diferença bruta entre os valores verdadeiros e os preditos: " + str(np.sum(y_true) - np.sum(y_pred)))
+#     print(f"Valores reais: {y_true[:5]}")  # Exibe os primeiros 5 valores
+#     print(f"Valores preditos: {y_pred[:5]}")  # Exibe os primeiros 5 valores preditos
+#     print(f"RSS calculado: {rss:.4f}")
+#     return rss
 
 # Número de rodadas da simulação
 R = 500
 
 # Listas para armazenar os resultados do RSS de cada modelo
 rss_mqo = []
-rss_mqo_r = {l: [] for l in [0, 0.25, 0.5, 0.75, 1]}
+rss_mqo_r = {l: [] for l in [0.25, 0.5, 0.75, 1]}
 rss_mvo = []
 
 # Início da simulação Monte Carlo
@@ -46,7 +59,7 @@ for i in range(R):
     # MQO Tradicional
     beta_mqo = get_mqo_coefficient(X_train_b, y_train)
     y_pred_mqo = X_test_b.dot(beta_mqo)
-    rss_mqo.append(calculate_rss(y_test, y_pred_mqo))
+    rss_mqo.append(calculate_rss(y_test, y_pred_mqo,))
     
     # MQO Regularizado (para cada lambda)
     for l in rss_mqo_r:
@@ -66,6 +79,7 @@ def calculate_statistics(rss_values):
     max_rss = np.max(rss_values)
     min_rss = np.min(rss_values)
     return mean_rss, std_rss, max_rss, min_rss
+
 # Função para formatar e imprimir as estatísticas
 def print_statistics(stats_mqo, stats_mqo_r, stats_mvo):
     print("Estatísticas do MQO Tradicional (RSS):")
@@ -80,7 +94,6 @@ def print_statistics(stats_mqo, stats_mqo_r, stats_mvo):
 
 def get_regression_line(X, beta):
     # Calcula os valores preditos de y (linha de regressão) com base nos coeficientes beta
-    # X aqui é a matriz com coluna de 1s (intercepto)
     y_pred = X.dot(beta)
     return y_pred
 
@@ -98,22 +111,39 @@ stats_mvo = calculate_statistics(rss_mvo)
 # Exibir os resultados
 print_statistics(stats_mqo, stats_mqo_r, stats_mvo)
 plot_results(stats_mqo, stats_mqo_r, rss_mqo_r, stats_mvo)
+
 # Adicionar intercepto à matriz X para o cálculo da linha de regressão
 X_b = np.hstack([np.ones((X_matrix.shape[0], 1)), X_matrix])
 
 # Calcular os coeficientes beta usando o MQO (ou qualquer método desejado)
 beta_mqo = get_mqo_coefficient(X_b, y_vector)
 
-# Obter os valores preditos para traçar a linha
-y_pred_line = get_regression_line(X_b, beta_mqo)
+# Obter os valores preditos para traçar a linha de regressão
+y_pred_line_mqo = get_regression_line(X_b, beta_mqo)
 
-# Plotar o gráfico com os dados e a linha de regressão
+# Calcular linhas de regressão para MQO Regularizado e Média dos Valores Observáveis
+y_pred_lines_r = {}
+for l in rss_mqo_r:
+    beta_r = get_mqo_r_coefficients(X_b, y_vector, l)
+    y_pred_lines_r[l] = get_regression_line(X_b, beta_r)
+
+# Média dos Valores Observáveis
+beta_mvo = get_mvo_coefficients(y_vector)
+y_pred_line_mvo = np.full_like(y_vector, beta_mvo[0])  # Média é o intercepto
+
+# Plotar o gráfico com os dados e as linhas de regressão
 plt.scatter(X_matrix, y_vector, label='Dados reais', color='blue')
-plt.plot(X_matrix, y_pred_line, color='red', label='Linha de Regressão MQO')
+plt.plot(X_matrix, y_pred_line_mqo, color='red', label='Linha de Regressão MQO')
+
+# Adicionar linhas de regressão MQO Regularizado
+for l, y_pred_r in y_pred_lines_r.items():
+    plt.plot(X_matrix, y_pred_r, label=f'Linha de Regressão MQO Regularizado λ={l}')
+
+# Adicionar linha de Média dos Valores Observáveis
+plt.plot(X_matrix, y_pred_line_mvo, label='Linha Média dos Valores Observáveis', linestyle='--')
+
 plt.xlabel('Velocidade do Vento')
 plt.ylabel('Potência Gerada')
 plt.legend()
-plt.title('Gráfico de Dispersão com Linha de Regressão')
+plt.title('Gráfico de Dispersão com Linhas de Regressão')
 plt.show()
-
-bp = 1

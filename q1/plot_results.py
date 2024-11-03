@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
+
 def plot_results(stats_mqo, stats_mqo_r, rss_mqo_r, stats_mvo):
     # Extrair os dados das estatísticas
-    labels = ['MQO Tradicional', 'MQO Regularizado λ=0', 'MQO Regularizado λ=0.25',
-            'MQO Regularizado λ=0.5', 'MQO Regularizado λ=0.75', 'MQO Regularizado λ=1', 
-            'Média dos Valores Observáveis']
+    labels = ['MQO Tradicional', 'MQO Regularizado λ=0.25',
+              'MQO Regularizado λ=0.5', 'MQO Regularizado λ=0.75', 'MQO Regularizado λ=1', 
+              'Média dos Valores Observáveis']
 
     # Organizar as estatísticas em listas
     mean_values = [stats_mqo[0]] + [stats_mqo_r[l][0] for l in rss_mqo_r] + [stats_mvo[0]]
@@ -31,6 +32,12 @@ def plot_results(stats_mqo, stats_mqo_r, rss_mqo_r, stats_mvo):
     ax.legend()
     ax.grid(axis='y')
 
+    # Aplicar escala logarítmica no eixo y
+    ax.set_yscale('log')
+
     # Exibindo o gráfico
     plt.tight_layout()
     plt.show()
+
+# Exemplo de uso
+# plot_results(stats_mqo, stats_mqo_r, rss_mqo_r, stats_mvo)
