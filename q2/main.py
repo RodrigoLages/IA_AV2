@@ -23,26 +23,24 @@ for i in range(rounds):
 
   # ____________________________ Training ____________________________________
   W_mqo = mqo.train(X_train, Y_train)
-  pri_trad, means_trad, cov_matrices_trad = gauss.train_regularized(X_train, Y_train, lambda_reg=0.001)
+  means_shr, cov_matrix_shr = gauss.train_shared_covariance(X_train, Y_train)
+  means_naive, cov_matrix_naive = gauss.train_naive_bayes(X_train, Y_train)
+  pri_trad, means_trad, cov_matrices_trad = gauss.train_regularized(X_train, Y_train, lambda_reg=0)
   pri_025, means_025, cov_matrices_025 = gauss.train_regularized(X_train, Y_train, lambda_reg=0.25)
   pri_050, means_050, cov_matrices_050 = gauss.train_regularized(X_train, Y_train, lambda_reg=0.50)
   pri_075, means_075, cov_matrices_075 = gauss.train_regularized(X_train, Y_train, lambda_reg=0.75)
-
-
-
+  pri_100, means_100, cov_matrices_100 = gauss.train_regularized(X_train, Y_train, lambda_reg=1)
 
 
   # ____________________________ Evaluating ____________________________________
   models_acc[0][i] = mqo.evaluate(X_test, Y_test, W_mqo)
+  models_acc[2][i] = gauss.evaluate_linear_models(X_test, Y_test, means_shr, cov_matrix_shr)
+  models_acc[4][i] = gauss.evaluate_linear_models(X_test, Y_test, means_naive, cov_matrix_naive)
   models_acc[1][i] = gauss.evaluate_regularized(X_test, Y_test, pri_trad, means_trad, cov_matrices_trad)
   models_acc[5][i] = gauss.evaluate_regularized(X_test, Y_test, pri_025, means_025, cov_matrices_025)
   models_acc[6][i] = gauss.evaluate_regularized(X_test, Y_test, pri_050, means_050, cov_matrices_050)
   models_acc[7][i] = gauss.evaluate_regularized(X_test, Y_test, pri_075, means_075, cov_matrices_075)
-
-
-
-
-
+  models_acc[3][i] = gauss.evaluate_regularized(X_test, Y_test, pri_100, means_100, cov_matrices_100)
 
 
   if i % 50 == 49:
