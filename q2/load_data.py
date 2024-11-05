@@ -28,7 +28,7 @@ def load_data(plot=False):
     plt.title("EMG Data Scatter Plot")
     plt.xlabel("Sensor 1")
     plt.ylabel("Sensor 2")
-    plt.legend(title="Classes")
+    plt.legend(title="Classes", prop={'size': 12})
     plt.show()
 
   categories = data[2, :].astype(int)

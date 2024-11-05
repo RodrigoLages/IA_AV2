@@ -65,5 +65,41 @@ stats_table = pd.DataFrame({
 
 print(stats_table)
 
+# Gráfico de Média de Precisão
+plt.figure(figsize=(10, 6))
+plt.bar(models_names, means, color='skyblue')
+plt.title("Média de Precisão por Modelo")
+plt.ylabel("Média de Precisão")
+plt.xlabel("Modelos")
+plt.xticks(rotation=45)
+plt.show()
+
+# Gráfico de Desvio Padrão
+plt.figure(figsize=(10, 6))
+plt.bar(models_names, std_devs, color='salmon')
+plt.title("Desvio Padrão da Precisão por Modelo")
+plt.ylabel("Desvio Padrão")
+plt.xlabel("Modelos")
+plt.xticks(rotation=45)
+plt.show()
+
+# Gráfico de Precisão Máxima
+plt.figure(figsize=(10, 6))
+plt.bar(models_names, highest_values, color='lightgreen')
+plt.title("Precisão Máxima por Modelo")
+plt.ylabel("Precisão Máxima")
+plt.xlabel("Modelos")
+plt.xticks(rotation=45)
+plt.show()
+
+# Gráfico de Precisão Mínima
+plt.figure(figsize=(10, 6))
+plt.bar(models_names, lowest_values, color='lightcoral')
+plt.title("Precisão Mínima por Modelo")
+plt.ylabel("Precisão Mínima")
+plt.xlabel("Modelos")
+plt.xticks(rotation=45)
+plt.show()
+
 
 bp=1
