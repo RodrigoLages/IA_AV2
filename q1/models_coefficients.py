@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-dados = np.loadtxt('aerogerador.dat')
+dados = np.loadtxt('q1/aerogerador.dat')
 
 
 X = dados[:, 0]  
@@ -30,8 +30,8 @@ def get_mqo_coefficient(X, y):
 #{----------------------------- MQO regularizado -----------------------------}
 def get_mqo_r_coefficients(X, y, l):
     
-    beta_ridge = np.linalg.pinv(X.T.dot(X) + l * np.eye(X.shape[1])).dot(X.T).dot(y)
-    return beta_ridge.ravel()
+    beta_mqo_r = np.linalg.pinv(X.T.dot(X) + l * np.eye(X.shape[1])).dot(X.T).dot(y)
+    return beta_mqo_r.ravel()
 
 #{----------------------- Média dos valores observáveis ----------------------}
 def get_mvo_coefficients(y):
